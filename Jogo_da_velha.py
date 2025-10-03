@@ -1,3 +1,4 @@
+
 #Jogo da velha com Heuristica
 import pygame as pg
 
@@ -67,7 +68,44 @@ def checar_vitoria(jogada):
     if matriz[0][2] == jogada and matriz[1][1] == jogada and matriz[2][0] == jogada:
         return True
 
-            
+def jogada_ia():
+
+            #Troca espaços vazios por sua jogada e verifica ganha
+            for l in range(3):
+                for c in range(3):
+                    if matriz[l][c] == 0:
+                        matriz[l][c] = 2
+                        if checar_vitoria(2):
+                            return
+                        matriz[l][c] = 0
+
+            #Bloqueia se jogador pode vencer
+            for l in range(3):
+                for c in range(3):
+                    if matriz[l][c] == 0:
+                        matriz[l][c] = 1
+                        if checar_vitoria(1):
+                            matriz[l][c] = 2
+                            return
+                        matriz[l][c] = 0
+
+            #Se não outras requisições joga nessas
+            #centro
+            if matriz[1][1] == 0:
+                matriz[1][1] = 2
+                return
+
+            #cantos
+            for l, c in [(0,0), (0,2), (2,0), (2,2)]:
+                if matriz[l][c] == 0:
+                    matriz[l][c] = 2
+                    return
+
+            #laterais
+            for l, c in [(0,1), (1,0), (1,2), (2,1)]:
+                if matriz[l][c] == 0:
+                    matriz[l][c] = 2
+                    return
 def main():
 
     pg.init()
@@ -76,12 +114,8 @@ def main():
 
     loop = True
     while loop:
-
         
         for eventos in pg.event.get():
-
-
-            
             
             #Mouse
             if eventos.type == pg.MOUSEBUTTONDOWN:
@@ -91,29 +125,21 @@ def main():
                 
                 if 0 <= linha < 3 and 0 <= coluna < 3:
                     
-                    if debug == True:
-                        print('x:',x,'y:',y,'coluna:', coluna, 'linha:', linha)
-
                     #Jogada do usuário -> X
                     if matriz[linha][coluna] == 0:  
-                        matriz[linha][coluna] = 1
-
-                        if debug == True:
-                            print(matriz)                            
-                            
+                        matriz[linha][coluna] = 1                                  
                         
-                        if checar_vitoria(1) == True:
+                        if not checar_vitoria(1) == True:
+                            jogada_ia()
                             
                             if debug == True:
-                                print('Vitória: ', checar_vitoria(1))
-                
-
+                                print('x:',x,'y:',y,'coluna:', coluna, 'linha:', linha)
+                                print(matriz) 
+                                print('Vitória Jogador: ', checar_vitoria(1), '\nVitória Máquina:', checar_vitoria(2))
+                                
             #Exit
             if eventos.type == pg.QUIT:
                 loop= False
-
-        #Debug
-            
                 
         desenhar_velha(tela)
         desenhar_jogada(tela)
